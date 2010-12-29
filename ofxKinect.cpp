@@ -281,7 +281,7 @@ void ofxKinect::clear(){
 //----------------------------------------------------------
 void ofxKinect::update(){
 
-//git testing 123
+//git testing 456
 
 #ifndef OPENNI
 	if(!kinectContext){
