@@ -60,6 +60,8 @@ ofxKinect::ofxKinect(){
 	rgbDepthMatrix.getPtr()[15]=1.000000;
 
 	calculateLookups();
+
+	cutOffFar=4096.0f;
 }
 
 void ofxKinect::calculateLookups() {
@@ -122,13 +124,13 @@ float* ofxKinect::getDistancePixels() {
 unsigned char * ofxKinect::getCalibratedRGBPixels(){
 	ofxVec3f texcoord3d;
 	unsigned char * calibratedPixels = calibratedRGBPixels;
-	for ( int y = 0; y < 480; y++) {
-		for ( int x = 0; x < 640; x++) {
+	for ( int y = 0; y < height; y++) {
+		for ( int x = 0; x < width; x++) {
 			texcoord3d.set(x,y,0);
 			texcoord3d = rgbDepthMatrix * texcoord3d ;
-			texcoord3d.x = ofClamp(texcoord3d.x,0,640);
-			texcoord3d.y = ofClamp(texcoord3d.y,0,480);
-			int pos = int(texcoord3d.y)*640*3+int(texcoord3d.x)*3;
+			texcoord3d.x = ofClamp(texcoord3d.x,0,width);
+			texcoord3d.y = ofClamp(texcoord3d.y,0,height);
+			int pos = int(texcoord3d.y)*width*3+int(texcoord3d.x)*3;
 			*calibratedPixels++ = videoPixels[pos];
 			*calibratedPixels++ = videoPixels[pos+1];
 			*calibratedPixels++ = videoPixels[pos+2];
@@ -269,7 +271,7 @@ void ofxKinect::clear(){
 		delete[] distancePixels; distancePixels = NULL;
 
 		delete[] videoPixels; videoPixels = NULL;
-		delete[] videoPixelsBack; videoPixelsBack = NULL;
+		//delete[] videoPixelsBack; videoPixelsBack = NULL;
 	}
 
 	depthTex.clear();
@@ -311,8 +313,13 @@ void ofxKinect::update(){
 		#else
 		//OpenNI does all the conversion for us, so no need for lookups
         for(int i = 0; i < n; i++){
-				distancePixels[i] = (int)depthPixelsBack[i];;
-				depthPixels[i] = (int)depthPixelsBack[i]*255/8192;
+				distancePixels[i] = (int)depthPixelsBack[i];
+				int dPixel = ((int)depthPixelsBack[i])*255.0 /cutOffFar;
+//				depthPixels[i] = (int)depthPixelsBack[i]/8;
+                if (dPixel>255)
+                    depthPixels[i]=0;
+                else
+                    depthPixels[i]=dPixel;
         }
 		#endif
 
@@ -381,7 +388,7 @@ ofColor ofxKinect::getCalibratedColorAt(int x, int y){
 	ofxVec3f texcoord3d;
 	texcoord3d.set(x,y,0);
 	texcoord3d = rgbDepthMatrix * texcoord3d;
-	return getColorAt(ofClamp(texcoord3d.x,0,640),ofClamp(texcoord3d.y,0,480));
+	return getColorAt(ofClamp(texcoord3d.x,0,width),ofClamp(texcoord3d.y,0,height));
 }
 
 //------------------------------------
@@ -567,14 +574,9 @@ void ofxKinect::threadedFunction()
             videoPixelsBack=(unsigned char*)imageMD.Data();
             //depthPixelsBack=(unsigned short*)depthMD.Data();
 
-            memcpy(depthPixelsBack, depthMD.Data(), 640*480 * sizeof(unsigned short));
+            memcpy(depthPixelsBack, depthMD.Data(), width*height * sizeof(unsigned short));
 
             //unsigned short maxValue=2048;
-            /*
-            for (int i=0;i<640*480;i++){
-                depthPixelsBack[i]= (unsigned short)(max( (depthPixelsBack[i])* 255 / 2048,0));
-            }
-            */
 			thisKinect->bNeedsUpdate = true;
 
 			unlock();
@@ -584,16 +586,6 @@ void ofxKinect::threadedFunction()
 
     kinectContext->Shutdown();
     free(kinectContext);
-
-    /*
-	if (kinectContext)
-	{
-
-		StopNUICamera(kinectCamera);
-		DestroyNUICamera(kinectCamera);
-		DestroyNUIMotor(kinectMotor);
-	}
-		*/
 
 	ofLog(OF_LOG_VERBOSE, "ofxKinect: Connection closed");
 #endif

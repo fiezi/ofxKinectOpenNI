@@ -86,6 +86,8 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		float 			getHeight();
 		float 			getWidth();
 
+		float           cutOffFar;
+
 		ofPoint			getRawAccel();
 		ofPoint			getMksAccel();
 
