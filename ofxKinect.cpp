@@ -298,30 +298,31 @@ void ofxKinect::update(){
 	if ( this->lock() ) {
 
 		int n = width * height;
-		#ifndef OPENNI
-		if(bDepthNearValueWhite) {
-			for(int i = 0; i < n; i++){
-				distancePixels[i] = distancePixelsLookup[depthPixelsBack[i]];
-				depthPixels[i] = depthPixelsLookupNearWhite[depthPixelsBack[i]];
-			}
-		} else {
-			for(int i = 0; i < n; i++){
-				distancePixels[i] = distancePixelsLookup[depthPixelsBack[i]];
-				depthPixels[i] = depthPixelsLookupFarWhite[depthPixelsBack[i]];
-			}
+
+#ifndef OPENNI
+		for(int i = 0; i < n; i++){
+			distancePixels[i] = (int)distancePixelsLookup[depthPixelsBack[i]];
+			int dPixel = ((int)distancePixelsLookup[depthPixelsBack[i]])*1024.0 /cutOffFar;
+			if (dPixel>255)
+				depthPixels[i]=255;
+			else if (dPixel<=0)
+				depthPixels[i]=255;
+			else
+				depthPixels[i]=dPixel;
+			
 		}
-		#else
-		//OpenNI does all the conversion for us, so no need for lookups
+#else
         for(int i = 0; i < n; i++){
 				distancePixels[i] = (int)depthPixelsBack[i];
 				int dPixel = ((int)depthPixelsBack[i])*255.0 /cutOffFar;
-//				depthPixels[i] = (int)depthPixelsBack[i]/8;
-                if (dPixel>255)
-                    depthPixels[i]=0;
-                else
-                    depthPixels[i]=dPixel;
+				if (dPixel>255)
+					depthPixels[i]=255;
+				else if (dPixel<=0)
+					depthPixels[i]=255;
+				else
+					depthPixels[i]=dPixel;
         }
-		#endif
+#endif
 
 		memcpy(videoPixels, videoPixelsBack, n * bytespp);
 
@@ -594,6 +595,7 @@ void ofxKinect::threadedFunction()
 
 int ofxKinect::openKinect(){
 
+#ifdef OPENNI
     kinectContext = new Context;
 
     nRetVal = XN_STATUS_OK;
@@ -628,6 +630,6 @@ int ofxKinect::openKinect(){
 	depth.GetMetaData(depthMD);
 	image.GetMetaData(imageMD);
 
-
+#endif
 }
 

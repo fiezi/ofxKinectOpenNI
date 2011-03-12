@@ -1,14 +1,16 @@
 #pragma once
 
+#ifdef TARGET_WIN32
 #define OPENNI
+#endif
 
 #include "ofConstants.h"
 #include "ofTexture.h"
 #include "ofGraphics.h"
 #include "ofTypes.h"
-
 #include "ofxThread.h"
 #include "ofxVectorMath.h"
+
 
 #ifndef OPENNI
     #include <libusb.h>
