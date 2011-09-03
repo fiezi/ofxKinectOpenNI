@@ -1,7 +1,8 @@
-#pragma once
+#ifndef _OFXKINECT
+#define _OFXKINECT
 
 #ifdef TARGET_WIN32
-#define OPENNI
+  #define OPENNI
 #endif
 
 #include "ofConstants.h"
@@ -13,7 +14,7 @@
 
 
 #ifndef OPENNI
-    #include <libusb.h>
+    #include "libusb.h"
     #include "libfreenect.h"
 #else
     //---------------------------------------------------------------------------
@@ -207,3 +208,4 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		void readDepthAtPoint();
 };
 
+#endif

@@ -309,29 +309,18 @@ void ofxKinect::update(){
 				depthPixels[i]=255;
 			else
 				depthPixels[i]=dPixel;
-			
+
 		}
 #else
         for(int i = 0; i < n; i++){
 				distancePixels[i] = (int)depthPixelsBack[i];
 				int dPixel = ((int)depthPixelsBack[i])*255.0 /cutOffFar;
-<<<<<<< HEAD
-//				depthPixels[i] = (int)depthPixelsBack[i]/8;
-                if (dPixel>255)
-                    depthPixels[i]=255;
-                else if (dPixel<=0)
-                    depthPixels[i]=255;
-                    //depthPixels[i]=0;
-                else
-                    depthPixels[i]=dPixel;
-=======
 				if (dPixel>255)
 					depthPixels[i]=255;
 				else if (dPixel<=0)
 					depthPixels[i]=255;
 				else
 					depthPixels[i]=dPixel;
->>>>>>> def44b1767a68d9ca63d42371f0ac7aa541e0f53
         }
 #endif
 
