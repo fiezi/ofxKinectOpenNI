@@ -1,28 +1,24 @@
-/*****************************************************************************
-*                                                                            *
-*  OpenNI 1.0 Alpha                                                          *
-*  Copyright (C) 2010 PrimeSense Ltd.                                        *
-*                                                                            *
-*  This file is part of OpenNI.                                              *
-*                                                                            *
-*  OpenNI is free software: you can redistribute it and/or modify            *
-*  it under the terms of the GNU Lesser General Public License as published  *
-*  by the Free Software Foundation, either version 3 of the License, or      *
-*  (at your option) any later version.                                       *
-*                                                                            *
-*  OpenNI is distributed in the hope that it will be useful,                 *
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of            *
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              *
-*  GNU Lesser General Public License for more details.                       *
-*                                                                            *
-*  You should have received a copy of the GNU Lesser General Public License  *
-*  along with OpenNI. If not, see <http://www.gnu.org/licenses/>.            *
-*                                                                            *
-*****************************************************************************/
-
-
-
-
+/****************************************************************************
+*                                                                           *
+*  OpenNI 1.1 Alpha                                                         *
+*  Copyright (C) 2011 PrimeSense Ltd.                                       *
+*                                                                           *
+*  This file is part of OpenNI.                                             *
+*                                                                           *
+*  OpenNI is free software: you can redistribute it and/or modify           *
+*  it under the terms of the GNU Lesser General Public License as published *
+*  by the Free Software Foundation, either version 3 of the License, or     *
+*  (at your option) any later version.                                      *
+*                                                                           *
+*  OpenNI is distributed in the hope that it will be useful,                *
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+*  GNU Lesser General Public License for more details.                      *
+*                                                                           *
+*  You should have received a copy of the GNU Lesser General Public License *
+*  along with OpenNI. If not, see <http://www.gnu.org/licenses/>.           *
+*                                                                           *
+****************************************************************************/
 #ifndef __XN_PLATFORM_H__
 #define __XN_PLATFORM_H__
 
@@ -37,6 +33,8 @@
 #define XN_PLATFORM_FILES_ONLY 6
 #define XN_PLATFORM_ARC 6
 #define XN_PLATFORM_LINUX_ARM 7
+#define XN_PLATFORM_MACOSX 8
+#define XN_PLATFORM_ANDROID_ARM 9
 
 #define XN_PLATFORM_IS_LITTLE_ENDIAN 1
 #define XN_PLATFORM_IS_BIG_ENDIAN    2
@@ -51,12 +49,28 @@
 //---------------------------------------------------------------------------
 
 #if defined(_WIN32) // Microsoft Visual Studio
+/*      - to make work with GCC
+	#ifndef RC_INVOKED
+		#if _MSC_VER < 1300 // Before MSVC7 (2003)
+			#error Xiron Platform Abstraction Layer - Win32 - Microsoft Visual Studio versions below 2003 (7.0) are not supported!
+		#endif
 
+		#if _MSC_VER > 1600 // After MSVC8 (2010)
+			#error Xiron Platform Abstraction Layer - Win32 - Microsoft Visual Studio versions above 2010 (10.0) are not supported!
+		#endif
+	#endif
+*/
 	#include "Win32/XnPlatformWin32.h"
+#elif defined(android) && defined(__arm__)
+	#include "Android-Arm/XnPlatformAndroid-Arm.h"
 #elif (linux && (i386 || __x86_64__))
 	#include "Linux-x86/XnPlatformLinux-x86.h"
 #elif (linux && __arm__)
 	#include "Linux-Arm/XnPlatformLinux-Arm.h"
+#elif _ARC
+	#include "ARC/XnPlatformARC.h"
+#elif (__APPLE__)
+	#include "MacOSX/XnPlatformMacOSX.h"
 #else
 	#error OpenNI Platform Abstraction Layer - Unsupported Platform!
 #endif
@@ -75,6 +89,10 @@
 #define XN_MIN(a,b)            (((a) < (b)) ? (a) : (b))
 
 #define XN_MAX(a,b)            (((a) > (b)) ? (a) : (b))
+
+typedef void (*XnFuncPtr)();
+
+#define XN_COMPILER_ASSERT(x) typedef int compileAssert[x ? 1 : -1]
 
 //---------------------------------------------------------------------------
 // API Export/Import Macros

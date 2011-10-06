@@ -1,9 +1,6 @@
 #ifndef _OFXKINECT
 #define _OFXKINECT
 
-#ifdef TARGET_WIN32
-  #define OPENNI
-#endif
 
 #include "ofConstants.h"
 #include "ofTexture.h"
@@ -11,6 +8,11 @@
 #include "ofTypes.h"
 #include "ofxThread.h"
 #include "ofxVectorMath.h"
+
+
+#ifdef TARGET_WIN32
+  #define OPENNI
+#endif
 
 
 #ifndef OPENNI
@@ -22,13 +24,15 @@
     //---------------------------------------------------------------------------
     #include <XnOpenNI.h>
     #include <XnLog.h>
+    #include <XnCodecIDs.h>
     #include <XnCppWrapper.h>
     #include <XnFPSCalculator.h>
 
     //---------------------------------------------------------------------------
     // Defines
     //---------------------------------------------------------------------------
-    #define SAMPLE_XML_PATH "data/SamplesConfig.xml"
+    //#define SAMPLE_XML_PATH "data/SamplesConfig.xml"
+    #define SAMPLE_XML_PATH "data/Sample-User.xml"
 
     //---------------------------------------------------------------------------
     // Macros
@@ -131,12 +135,14 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		void 			drawDepth(float x, float y, float w, float h);
 		void 			drawDepth(float x, float y);
 
+
 		const static int	width = 640;
 		const static int	height = 480;
 
-	protected:
+
 
 		bool					bUseTexture;
+		bool                    bImage;
 		ofTexture				depthTex;			// the depth texture
 		ofTexture 				videoTex;				// the RGB texture
 		bool 					bVerbose;
@@ -161,7 +167,8 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		static unsigned char depthPixelsLookupNearWhite[2048];
 		static unsigned char depthPixelsLookupFarWhite[2048];
 
-    private:
+        static ofxKinect*   thisKinect;
+
 
 #ifndef OPENNI
 		freenect_context *	kinectContext;	// kinect context handle
@@ -170,14 +177,19 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
         Context * kinectContext;
         EnumerationErrors errors;
 
-        XnStatus nRetVal;
-
+        XnStatus rc;
         XnFPSData xnFPS;
+
+        XnUserID nPlayer;
+        XnBool bCalibrated;
 
         DepthGenerator depth;
         ImageGenerator image;
+        UserGenerator userGenerator;
         ImageMetaData imageMD;
         DepthMetaData depthMD;
+        SceneMetaData sceneMD;
+
 #endif
 
 
@@ -204,6 +216,10 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		void threadedFunction();
 
 		int openKinect();
+
+        XnBool AssignPlayer(XnUserID user);
+        void findPlayer();
+        void lostPlayer();
 
 		void readDepthAtPoint();
 };
