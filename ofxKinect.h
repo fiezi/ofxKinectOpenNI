@@ -32,7 +32,8 @@
     // Defines
     //---------------------------------------------------------------------------
     //#define SAMPLE_XML_PATH "data/SamplesConfig.xml"
-    #define SAMPLE_XML_PATH "data/Sample-User.xml"
+    #define SAMPLE_XML_PATH "data/Samples-Image.xml"
+    //#define SAMPLE_XML_PATH "data/Sample-User.xml"
 
     //---------------------------------------------------------------------------
     // Macros
