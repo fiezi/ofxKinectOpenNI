@@ -12,18 +12,24 @@ unsigned char ofxKinect::depthPixelsLookupFarWhite[2048];
 
 void XN_CALLBACK_TYPE NewUser(xn::UserGenerator& generator, XnUserID user, void* pCookie){
 
-	if (!ofxKinect::thisKinect->bCalibrated) // check on player0 is enough
-	{
-		printf("Look for pose\n");
-		ofxKinect::thisKinect->userGenerator.GetPoseDetectionCap().StartPoseDetection("Psi", user);
-		return;
-	}
 
-	ofxKinect::thisKinect->AssignPlayer(user);
+    cout << "*************************** NEW USER!!!!! *********************************" << endl;
+
+    kinectUser* myUser= new kinectUser;
+    myUser->userID=user;
+    myUser->bCalibrated=false;
+	printf("Look for pose\n");
+    ofxKinect::thisKinect->userGenerator.GetPoseDetectionCap().StartPoseDetection("Psi", user);
+
+    ofxKinect::thisKinect->users.push_back(myUser);
+
+    cout << "size: " << ofxKinect::thisKinect->users.size() << " id: " << user << endl;
+
+//	ofxKinect::thisKinect->AssignPlayer(user);
 // 	if (g_nPlayer == 0)
 // 	{
 // 		printf("Assigned user\n");
-// 		g_UserGenerator.GetSkeletonCap().LoadCalibrationData(user, 0);
+// 		g_userGenerator->GetSkeletonCap().LoadCalibrationData(user, 0);
 // 		g_UserGenerator.GetSkeletonCap().StartTracking(user);
 // 		g_nPlayer = user;
 // 	}
@@ -31,15 +37,27 @@ void XN_CALLBACK_TYPE NewUser(xn::UserGenerator& generator, XnUserID user, void*
 
 void XN_CALLBACK_TYPE LostUser(xn::UserGenerator& generator, XnUserID user, void* pCookie){
 
+    //remove user
+
 	printf("Lost user %d\n", user);
-	if (ofxKinect::thisKinect->nPlayer == user)
-	{
-		ofxKinect::thisKinect->lostPlayer();
-	}
+	for (int i=0; i<ofxKinect::thisKinect->users.size(); i++){
+
+        if (ofxKinect::thisKinect->users[i]->userID == user){
+            ofxKinect::thisKinect->users.erase(ofxKinect::thisKinect->users.begin() + i);
+            return;
+        }
+    }
 }
 
 void XN_CALLBACK_TYPE PoseDetected(xn::PoseDetectionCapability& pose, const XnChar* strPose, XnUserID user, void* cxt){
 	printf("Found pose \"%s\" for user %d\n", strPose, user);
+
+        kinectUser* myUser;
+	    for (int i=0; i<ofxKinect::thisKinect->users.size();i++){
+            if (ofxKinect::thisKinect->users[i]->userID==user)
+                myUser=ofxKinect::thisKinect->users[i];
+	    }
+
 	ofxKinect::thisKinect->userGenerator.GetSkeletonCap().RequestCalibration(user, TRUE);
 	ofxKinect::thisKinect->userGenerator.GetPoseDetectionCap().StopPoseDetection(user);
 }
@@ -52,35 +70,54 @@ void XN_CALLBACK_TYPE CalibrationStarted(xn::SkeletonCapability& skeleton, XnUse
 void XN_CALLBACK_TYPE CalibrationEnded(xn::SkeletonCapability& skeleton, XnUserID user, XnBool bSuccess, void* cxt){
 
 	printf("Calibration done [%d] %ssuccessfully\n", user, bSuccess?"":"un");
+
+    kinectUser* myUser;
+    for (int i=0; i<ofxKinect::thisKinect->users.size();i++){
+        if (ofxKinect::thisKinect->users[i]->userID==user)
+            myUser=ofxKinect::thisKinect->users[i];
+    }
+
+
 	if (bSuccess)
 	{
-		if (!ofxKinect::thisKinect->bCalibrated)
+
+		if (!myUser->bCalibrated)
 		{
 			ofxKinect::thisKinect->userGenerator.GetSkeletonCap().SaveCalibrationData(user, 0);
-			ofxKinect::thisKinect->nPlayer = user;
+			//myUser->userID = user;
 			ofxKinect::thisKinect->userGenerator.GetSkeletonCap().StartTracking(user);
-			ofxKinect::thisKinect->bCalibrated = TRUE;
+			myUser->bCalibrated = TRUE;
 		}
 
+        //stop pose detection for other users? aha aha
 		XnUserID aUsers[10];
 		XnUInt16 nUsers = 10;
 		ofxKinect::thisKinect->userGenerator.GetUsers(aUsers, nUsers);
 		for (int i = 0; i < nUsers; ++i)
 			ofxKinect::thisKinect->userGenerator.GetPoseDetectionCap().StopPoseDetection(aUsers[i]);
 	}
+
+
 }
 
 void XN_CALLBACK_TYPE CalibrationCompleted(xn::SkeletonCapability& skeleton, XnUserID user, XnCalibrationStatus eStatus, void* cxt){
 
 	printf("Calibration done [%d] %ssuccessfully\n", user, (eStatus == XN_CALIBRATION_STATUS_OK)?"":"un");
+
+        kinectUser* myUser;
+	    for (int i=0; i<ofxKinect::thisKinect->users.size();i++){
+            if (ofxKinect::thisKinect->users[i]->userID==user)
+                myUser=ofxKinect::thisKinect->users[i];
+	    }
+
 	if (eStatus == XN_CALIBRATION_STATUS_OK)
 	{
-		if (!ofxKinect::thisKinect->bCalibrated)
+		if (!myUser->bCalibrated)
 		{
 			ofxKinect::thisKinect->userGenerator.GetSkeletonCap().SaveCalibrationData(user, 0);
-			ofxKinect::thisKinect->nPlayer = user;
+			//ofxKinect::thisKinect->nPlayer = user;
 			ofxKinect::thisKinect->userGenerator.GetSkeletonCap().StartTracking(user);
-			ofxKinect::thisKinect->bCalibrated = TRUE;
+			myUser->bCalibrated = TRUE;
 		}
 
 		XnUserID aUsers[10];
@@ -149,8 +186,8 @@ ofxKinect::ofxKinect(){
 
 	calculateLookups();
 
-    nPlayer = 0;
-    bCalibrated=false;
+    //nPlayer = 0;
+    //bCalibrated=false;
 
 	cutOffFar=4096.0f;
 }
@@ -557,91 +594,8 @@ bool ofxKinect::isDepthNearValueWhite(){
 	return bDepthNearValueWhite;
 }
 
-/* ***** PRIVATE ***** */
-#ifndef OPENNI
-//---------------------------------------------------------------------------
-void ofxKinect::grabDepthFrame(freenect_device *dev, void *depth, uint32_t timestamp) {
-
-	if (thisKinect->lock()) {
-		try {
-			memcpy(thisKinect->depthPixelsBack, depth, FREENECT_DEPTH_11BIT_SIZE);
-			thisKinect->bNeedsUpdate = true;
-		}
-		catch(...) {
-			ofLog(OF_LOG_ERROR, "ofxKinect: Depth memcpy failed");
-		}
-		thisKinect->unlock();
-	} else {
-		ofLog(OF_LOG_WARNING, "ofxKinect: grabDepthFrame unable to lock mutex");
-	}
-}
-
-//---------------------------------------------------------------------------
-void ofxKinect::grabRgbFrame(freenect_device *dev, void *rgb, uint32_t timestamp) {
-
-	if (thisKinect->lock()) {
-		try {
-			memcpy(thisKinect->videoPixelsBack, rgb, thisKinect->bInfrared?FREENECT_VIDEO_IR_8BIT_SIZE:FREENECT_VIDEO_RGB_SIZE);
-			thisKinect->bNeedsUpdate = true;
-		}
-		catch (...) {
-			ofLog(OF_LOG_ERROR, "ofxKinect: Rgb memcpy failed");
-		}
-		thisKinect->unlock();
-	} else {
-		ofLog(OF_LOG_ERROR, "ofxKinect: grabRgbFrame unable to lock mutex");
-	}
-}
-#endif
 //---------------------------------------------------------------------------
 void ofxKinect::threadedFunction(){
-
-#ifndef OPENNI
-	freenect_set_led(kinectDevice, LED_GREEN);
-	freenect_set_video_format(kinectDevice, bInfrared?FREENECT_VIDEO_IR_8BIT:FREENECT_VIDEO_RGB);
-	freenect_set_depth_format(kinectDevice, FREENECT_DEPTH_11BIT);
-	freenect_set_depth_callback(kinectDevice, &grabDepthFrame);
-	freenect_set_video_callback(kinectDevice, &grabRgbFrame);
-
-	ofLog(OF_LOG_VERBOSE, "ofxKinect: Connection opened");
-
-	freenect_start_depth(kinectDevice);
-	freenect_start_video(kinectDevice);
-
-	while (isThreadRunning()) {
-		if( bTiltNeedsApplying ){
-
-			freenect_set_tilt_degs(kinectDevice, targetTiltAngleDeg);
-			bTiltNeedsApplying = false;
-		}
-
-		freenect_update_tilt_state(kinectDevice);
-		freenect_raw_tilt_state * tilt = freenect_get_tilt_state(kinectDevice);
-
-		rawAccel.set(tilt->accelerometer_x, tilt->accelerometer_y, tilt->accelerometer_z);
-
-		double dx,dy,dz;
-		freenect_get_mks_accel(tilt, &dx, &dy, &dz);
-		mksAccel.set(dx, dy, dz);
-
-		ofSleepMillis(20);
-
-//		printf("\r raw acceleration: %4d %4d %4d  mks acceleration: %4f %4f %4f", ax, ay, az, dx, dy, dz);
-	}
-
-//TODO: uncomment these when they are implemented in freenect
-	freenect_set_tilt_degs(kinectDevice, 0);
-	freenect_update_tilt_state(kinectDevice);
-	freenect_stop_depth(kinectDevice);
-	freenect_stop_video(kinectDevice);
-	freenect_set_led(kinectDevice, LED_YELLOW);
-
-	freenect_close_device(kinectDevice);
-	freenect_shutdown(kinectContext);
-
-	ofLog(OF_LOG_VERBOSE, "ofxKinect: Connection closed");
-
-#else
 
 	openKinect();
 
@@ -666,21 +620,30 @@ void ofxKinect::threadedFunction(){
                 videoPixelsBack=(unsigned char*)imageMD.Data();
 
             }else{
-                userGenerator.GetUserPixels(0,sceneMD);
-                const XnLabel* pLabels=sceneMD.Data();
-                if (nPlayer != 0){
-                    XnPoint3D com;
-                    userGenerator.GetCoM(nPlayer, com);
-                    if (com.Z == 0){
-                        nPlayer = 0;
-                        findPlayer();
-                    }
-                }
-                //color silhouette
-                for (int i=0;i<640*480*3;i++){
-                    videoPixelsBack[i]=0;
-                    if (pLabels[i/3]>0 && i%3==0 ){
-                        videoPixelsBack[i]=128;
+                for (int i=0;i<users.size();i++){
+                    userGenerator.GetUserPixels(users[i]->userID,sceneMD);
+                    const XnLabel* pLabels=sceneMD.Data();
+
+//finding players after they exit?
+/*
+                                kinectUser* myUser;
+                                for (int i=0; i<users.size();i++){
+
+                                        myUser=users[i];
+                                        XnPoint3D com;
+                                        myUser->userGenerator->GetCoM(myUser->userID, com);
+                                        if (com.Z == 0){
+                                            findPlayer();
+                                        }
+                                }
+*/
+
+                    //color silhouette
+                    for (int p=0;p<640*480*3;p++){
+                        videoPixelsBack[p]=0;
+                        if (pLabels[p/3]>0 && p%3==0 ){
+                            videoPixelsBack[p+i]=128;
+                        }
                     }
                 }
             }
@@ -703,7 +666,6 @@ void ofxKinect::threadedFunction(){
     free(kinectContext);
 
 	ofLog(OF_LOG_VERBOSE, "ofxKinect: Connection closed");
-#endif
 }
 
 
@@ -782,16 +744,11 @@ int ofxKinect::openKinect(){
 
 void ofxKinect::lostPlayer(){
 
-    nPlayer = 0;
-	findPlayer();
+    findPlayer();
 }
 
 void ofxKinect::findPlayer(){
 
-	if (nPlayer != 0)
-	{
-		return;
-	}
 	XnUserID aUsers[20];
 	XnUInt16 nUsers = 20;
 	userGenerator.GetUsers(aUsers, nUsers);
@@ -805,9 +762,6 @@ void ofxKinect::findPlayer(){
 
 XnBool ofxKinect::AssignPlayer(XnUserID user){
 
-	if (nPlayer != 0)
-		return false;
-
 	XnPoint3D com;
 	userGenerator.GetCoM(user, com);
 	if (com.Z == 0)
@@ -816,7 +770,7 @@ XnBool ofxKinect::AssignPlayer(XnUserID user){
 	printf("Matching for existing calibration\n");
 	userGenerator.GetSkeletonCap().LoadCalibrationData(user, 0);
 	userGenerator.GetSkeletonCap().StartTracking(user);
-	nPlayer = user;
+	//nPlayer = user;
 	return true;
 
 }

@@ -48,6 +48,12 @@
 
 #endif
 
+struct kinectUser{
+    int userID;
+    bool bCalibrated;
+};
+
+
 class ofxKinect : public ofBaseVideo, protected ofxThread{
 
 	public :
@@ -180,12 +186,15 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
         XnStatus rc;
         XnFPSData xnFPS;
 
-        XnUserID nPlayer;
-        XnBool bCalibrated;
+        //XnUserID nPlayer;
+        //XnBool bCalibrated;
 
         DepthGenerator depth;
         ImageGenerator image;
+
+        vector<kinectUser*> users;
         UserGenerator userGenerator;
+
         ImageMetaData imageMD;
         DepthMetaData depthMD;
         SceneMetaData sceneMD;
