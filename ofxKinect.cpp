@@ -698,41 +698,41 @@ int ofxKinect::openKinect(){
     if (bImage){
         rc = kinectContext->FindExistingNode(XN_NODE_TYPE_IMAGE, image);
         CHECK_RC(rc, "Find image generator");
+    }else{
+        rc = kinectContext->FindExistingNode(XN_NODE_TYPE_USER, userGenerator);
+        CHECK_RC(rc, "Find user generator");
+
+
+
+        if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_SKELETON) ||
+            !userGenerator.IsCapabilitySupported(XN_CAPABILITY_POSE_DETECTION))
+        {
+            printf("User generator doesn't support either skeleton or pose detection.\n");
+            return XN_STATUS_ERROR;
+        }
+
+
+        rc = xnFPSInit(&xnFPS, 180);
+        CHECK_RC(rc, "FPS Init");
+
+
+        userGenerator.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
+
+        rc = kinectContext->StartGeneratingAll();
+        CHECK_RC(rc, "StartGenerating");
+
+        XnCallbackHandle hUserCBs, hCalibrationStartCB, hCalibrationCompleteCB, hPoseCBs;
+
+        rc = userGenerator.RegisterUserCallbacks(NewUser, LostUser, this, hUserCBs);
+
+        rc = userGenerator.GetSkeletonCap().RegisterToCalibrationStart(CalibrationStarted, this, hCalibrationStartCB);
+        CHECK_RC(rc, "Register to calbiration start");
+        rc = userGenerator.GetSkeletonCap().RegisterToCalibrationComplete(CalibrationCompleted, this, hCalibrationCompleteCB);
+        CHECK_RC(rc, "Register to calibration complete");
+        rc = userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(PoseDetected, this, hPoseCBs);
+        CHECK_RC(rc, "Register to pose detected");
+
     }
-	rc = kinectContext->FindExistingNode(XN_NODE_TYPE_USER, userGenerator);
-	CHECK_RC(rc, "Find user generator");
-
-
-
-    if (!userGenerator.IsCapabilitySupported(XN_CAPABILITY_SKELETON) ||
-		!userGenerator.IsCapabilitySupported(XN_CAPABILITY_POSE_DETECTION))
-	{
-		printf("User generator doesn't support either skeleton or pose detection.\n");
-		return XN_STATUS_ERROR;
-	}
-
-
-	rc = xnFPSInit(&xnFPS, 180);
-	CHECK_RC(rc, "FPS Init");
-
-
-	userGenerator.GetSkeletonCap().SetSkeletonProfile(XN_SKEL_PROFILE_ALL);
-
-	rc = kinectContext->StartGeneratingAll();
-	CHECK_RC(rc, "StartGenerating");
-
-	XnCallbackHandle hUserCBs, hCalibrationStartCB, hCalibrationCompleteCB, hPoseCBs;
-
-    rc = userGenerator.RegisterUserCallbacks(NewUser, LostUser, this, hUserCBs);
-
-	rc = userGenerator.GetSkeletonCap().RegisterToCalibrationStart(CalibrationStarted, this, hCalibrationStartCB);
-	CHECK_RC(rc, "Register to calbiration start");
-	rc = userGenerator.GetSkeletonCap().RegisterToCalibrationComplete(CalibrationCompleted, this, hCalibrationCompleteCB);
-	CHECK_RC(rc, "Register to calibration complete");
-	rc = userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(PoseDetected, this, hPoseCBs);
-	CHECK_RC(rc, "Register to pose detected");
-
-
 	depth.GetMetaData(depthMD);
 
 	if (bImage)
