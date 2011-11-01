@@ -156,15 +156,6 @@ ofxKinect::ofxKinect(){
 
 	bImage=false;
 
-
-#ifndef OPENNI
-	kinectContext			= NULL;
-	kinectDevice			= NULL;
-#endif
-
-	targetTiltAngleDeg		= 0;
-	bTiltNeedsApplying		= false;
-
 	ofxKinect::thisKinect = this;
 
 	rgbDepthMatrix.getPtr()[0]=0.942040;
@@ -186,9 +177,7 @@ ofxKinect::ofxKinect(){
 
 	calculateLookups();
 
-    //nPlayer = 0;
-    //bCalibrated=false;
-
+    xml_path= "data/Sample-User.xml";
 	cutOffFar=4096.0f;
 }
 
@@ -354,6 +343,12 @@ bool ofxKinect::setCameraTiltAngle(float angleInDegrees){
 //--------------------------------------------------------------------
 bool ofxKinect::init(bool infrared, bool setUseTexture){
 	clear();
+
+    if (bImage)
+        xml_path="data/Sample-Image.xml";
+    else
+        xml_path="data/Sample-User.xml";
+
 
 	bInfrared = infrared;
 	bytespp = infrared?1:3;
@@ -624,25 +619,12 @@ void ofxKinect::threadedFunction(){
                     userGenerator.GetUserPixels(users[i]->userID,sceneMD);
                     const XnLabel* pLabels=sceneMD.Data();
 
-//finding players after they exit?
-/*
-                                kinectUser* myUser;
-                                for (int i=0; i<users.size();i++){
-
-                                        myUser=users[i];
-                                        XnPoint3D com;
-                                        myUser->userGenerator->GetCoM(myUser->userID, com);
-                                        if (com.Z == 0){
-                                            findPlayer();
-                                        }
-                                }
-*/
-
                     //color silhouette
                     for (int p=0;p<640*480*3;p++){
                         videoPixelsBack[p]=0;
-                        if (pLabels[p/3]>0 && p%3==0 ){
-                            videoPixelsBack[p+i]=128;
+                        if (pLabels[p/3]>0 ){
+                            if (p%3==pLabels[p/3]-1)
+                                videoPixelsBack[p]=128;
                         }
                     }
                 }
@@ -676,7 +658,10 @@ int ofxKinect::openKinect(){
 
     rc = XN_STATUS_OK;
 
-	rc = kinectContext->InitFromXmlFile(SAMPLE_XML_PATH, &errors);
+    if (bImage)
+        rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
+    else
+        rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
 
 	if (rc == XN_STATUS_NO_NODE_PRESENT)
 	{

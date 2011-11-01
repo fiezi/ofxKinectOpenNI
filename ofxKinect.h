@@ -10,15 +10,9 @@
 #include "ofxVectorMath.h"
 
 
-#ifdef TARGET_WIN32
-  #define OPENNI
-#endif
+    #define OPENNI
 
 
-#ifndef OPENNI
-    #include "libusb.h"
-    #include "libfreenect.h"
-#else
     //---------------------------------------------------------------------------
     // Includes
     //---------------------------------------------------------------------------
@@ -32,7 +26,7 @@
     // Defines
     //---------------------------------------------------------------------------
     //#define SAMPLE_XML_PATH "data/SamplesConfig.xml"
-    #define SAMPLE_XML_PATH "data/Samples-Image.xml"
+    //#define SAMPLE_XML_PATH "data/Samples-Image.xml"
     //#define SAMPLE_XML_PATH "data/Sample-User.xml"
 
     //---------------------------------------------------------------------------
@@ -47,7 +41,6 @@
 
     using namespace xn;
 
-#endif
 
 struct kinectUser{
     int userID;
@@ -177,18 +170,11 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
         static ofxKinect*   thisKinect;
 
 
-#ifndef OPENNI
-		freenect_context *	kinectContext;	// kinect context handle
-		freenect_device * 	kinectDevice;	// kinect device handle
-#else
         Context * kinectContext;
         EnumerationErrors errors;
 
         XnStatus rc;
         XnFPSData xnFPS;
-
-        //XnUserID nPlayer;
-        //XnBool bCalibrated;
 
         DepthGenerator depth;
         ImageGenerator image;
@@ -196,13 +182,11 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
         vector<kinectUser*> users;
         UserGenerator userGenerator;
 
+        string xml_path;
+
         ImageMetaData imageMD;
         DepthMetaData depthMD;
         SceneMetaData sceneMD;
-
-#endif
-
-
 
 		unsigned short *	depthPixelsBack;	// depth back
 		unsigned char *		videoPixelsBack;		// rgb back
@@ -217,11 +201,6 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		bool				bInfrared;
 		int					bytespp;
 
-#ifndef OPENNI
-		// libfreenect callbacks
-		static void grabDepthFrame(freenect_device *dev, void *depth, uint32_t timestamp);
-		static void grabRgbFrame(freenect_device *dev, void *rgb, uint32_t timestamp);
-#endif
 		// thread function
 		void threadedFunction();
 
