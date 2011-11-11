@@ -342,10 +342,11 @@ bool ofxKinect::setCameraTiltAngle(float angleInDegrees){
 
 //--------------------------------------------------------------------
 bool ofxKinect::init(bool infrared, bool setUseTexture){
+
 	clear();
 
     if (bImage)
-        xml_path="data/Sample-Image.xml";
+        xml_path="data/Samples-Image.xml";
     else
         xml_path="data/Sample-User.xml";
 
@@ -406,12 +407,6 @@ void ofxKinect::clear(){
 //----------------------------------------------------------
 void ofxKinect::update(){
 
-#ifndef OPENNI
-	if(!kinectContext){
-		return;
-	}
-#endif
-
 	if (!bNeedsUpdate){
 		return;
 	} else {
@@ -422,19 +417,6 @@ void ofxKinect::update(){
 
 		int n = width * height;
 
-#ifndef OPENNI
-		for(int i = 0; i < n; i++){
-			distancePixels[i] = (int)distancePixelsLookup[depthPixelsBack[i]];
-			int dPixel = ((int)distancePixelsLookup[depthPixelsBack[i]])*1024.0 /cutOffFar;
-			if (dPixel>255)
-				depthPixels[i]=255;
-			else if (dPixel<=0)
-				depthPixels[i]=255;
-			else
-				depthPixels[i]=dPixel;
-
-		}
-#else
         for(int i = 0; i < n; i++){
 				distancePixels[i] = (int)depthPixelsBack[i];
 				int dPixel = ((int)depthPixelsBack[i])*255.0 /cutOffFar;
@@ -445,7 +427,6 @@ void ofxKinect::update(){
 				else
 					depthPixels[i]=dPixel;
         }
-#endif
 
 		memcpy(videoPixels, videoPixelsBack, n * bytespp);
 
@@ -658,9 +639,6 @@ int ofxKinect::openKinect(){
 
     rc = XN_STATUS_OK;
 
-    if (bImage)
-        rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
-    else
         rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
 
 	if (rc == XN_STATUS_NO_NODE_PRESENT)
@@ -683,6 +661,17 @@ int ofxKinect::openKinect(){
     if (bImage){
         rc = kinectContext->FindExistingNode(XN_NODE_TYPE_IMAGE, image);
         CHECK_RC(rc, "Find image generator");
+
+
+        XnBool isSupported = depth.IsCapabilitySupported("AlternativeViewPoint");
+        if(isSupported){
+          XnStatus res = depth.GetAlternativeViewPointCap().SetViewPoint(image);
+          if(XN_STATUS_OK != res){
+            printf("Getting and setting AlternativeViewPoint failed: %s\n", xnGetStatusString(res));
+          }
+
+        }
+
     }else{
         rc = kinectContext->FindExistingNode(XN_NODE_TYPE_USER, userGenerator);
         CHECK_RC(rc, "Find user generator");
