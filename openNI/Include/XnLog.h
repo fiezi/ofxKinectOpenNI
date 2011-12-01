@@ -33,7 +33,7 @@
 // Exported Function Declaration
 //---------------------------------------------------------------------------
 
-/** 
+/**
  * @name Initialization
  * Functions for initializing and shutting down the logger.
  * @{
@@ -46,7 +46,7 @@ XN_C_API XnStatus XN_C_DECL xnLogInitSystem();
 
 /**
 * This function initializes the log from an INI file.
-* 
+*
 * @param	csINIFile		[in]	The name of the INI file.
 * @param	csSectionName	[in]	The name of the section to read values from.
 */
@@ -54,7 +54,7 @@ XN_C_API XnStatus XN_C_DECL xnLogInitFromINIFile(const XnChar* csINIFile, const 
 
 /**
 * This function initializes the log from an XML file.
-* 
+*
 * @param	strFileName		[in]	The name of the XML file.
 */
 XN_C_API XnStatus XN_C_DECL xnLogInitFromXmlFile(const XnChar* strFileName);
@@ -66,7 +66,7 @@ XN_C_API XnStatus XN_C_DECL xnLogClose();
 
 // @}
 
-/** 
+/**
  * @name Filtering Log Messages
  * Functions for managing filters on the log system.
  * @{
@@ -91,7 +91,7 @@ XN_C_API XnLogSeverity XN_C_DECL xnLogGetMaskMinSeverity(const XnChar* strMask);
 
 // @}
 
-/** 
+/**
  * @name Log Writers
  * Functions for managing which writers are active in the log system (i.e. which outputs
  * will be generated).
@@ -128,7 +128,7 @@ XN_C_API XnStatus XN_C_DECL xnLogSetFileOutput(XnBool bFileOutput);
 
 // @}
 
-/** 
+/**
  * @name File Output
  * Functions for configuring how files are created.
  * @{
@@ -148,14 +148,14 @@ XN_C_API XnStatus XN_C_DECL xnLogSetLineInfo(XnBool bLineInfo);
 
 /**
  * Configures the folder under which logs will be written.
- * 
+ *
  * @param	strOutputFolder	[in]	Folder to write to
- */ 
+ */
 XN_C_API XnStatus XN_C_DECL xnLogSetOutputFolder(const XnChar* strOutputFolder);
 
 // @}
 
-/** 
+/**
  * @name Logger API
  * Functions for writing entries to the log (used mainly by middleware developers)
  * @{
@@ -378,7 +378,7 @@ XN_C_API void XN_C_DECL _xnLoggerClose(XnLogger* pLogger);
 
 // @}
 
-/** 
+/**
  * @name Misc.
  * Miscellaneous functions regarding the log system.
  * @{
@@ -500,7 +500,7 @@ XN_C_API void XN_C_DECL xnLogWriteBinaryData(const XnChar* csLogMask, XnLogSever
 		if (nRetVal != XN_STATUS_OK)													\
 	{																					\
 		XN_LOG_RETURN(nRetVal, nSeverity, csLogMask, csFormat)							\
-	}																						
+	}
 
 	/* If nRetVal is not ok, logs a warning and returns nRetVal */
 	#define XN_IS_STATUS_OK_WARNING(nRetVal, csLogMask, csFormat...)					\
@@ -517,12 +517,13 @@ XN_C_API void XN_C_DECL xnLogWriteBinaryData(const XnChar* csLogMask, XnLogSever
 	#define xnLogError(csLogMask, csFormat, args)	xnLogWrite(csLogMask, XN_LOG_ERROR, __FILE__, __LINE__, csFormat, args)
 
 	/* Writes to the log and returns nRetVal */
+/*
 	#define XN_LOG_RETURN(nRetVal, nSeverity csLogMask, csFormat, args)					\
 	{																					\
 		xnLogWrite(csLogMask, nSeverity, __FILE__, __LINE__, csFormat, args);			\
 		return (nRetVal);																\
 	}
-
+*/
 	/* Logs a warning and returns nRetVal */
 	#define XN_LOG_WARNING_RETURN(nRetVal, csLogMask, csFormat, args)					\
 		XN_LOG_RETURN(nRetVal, XN_LOG_WARNING, csLogMask, csFormat, args)

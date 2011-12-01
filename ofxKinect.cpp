@@ -612,7 +612,7 @@ void ofxKinect::threadedFunction(){
             }
             const XnDepthPixel* pImageIR = depthMD.Data();
 
-            memcpy(depthPixelsBack, depthMD.Data(), width*height * sizeof(unsigned short));
+            memcpy(depthPixelsBack, depthMD.Data(), depthMD.XRes()*depthMD.YRes() * sizeof(unsigned short));
 
 
 
@@ -671,6 +671,11 @@ int ofxKinect::openKinect(){
           }
 
         }
+        rc = xnFPSInit(&xnFPS, 30);
+        CHECK_RC(rc, "FPS Init");
+
+        rc = kinectContext->StartGeneratingAll();
+        CHECK_RC(rc, "StartGenerating");
 
     }else{
         rc = kinectContext->FindExistingNode(XN_NODE_TYPE_USER, userGenerator);
@@ -686,7 +691,7 @@ int ofxKinect::openKinect(){
         }
 
 
-        rc = xnFPSInit(&xnFPS, 180);
+        rc = xnFPSInit(&xnFPS, 30);
         CHECK_RC(rc, "FPS Init");
 
 
@@ -707,7 +712,10 @@ int ofxKinect::openKinect(){
         CHECK_RC(rc, "Register to pose detected");
 
     }
+
+
 	depth.GetMetaData(depthMD);
+
 
 	if (bImage)
         image.GetMetaData(imageMD);

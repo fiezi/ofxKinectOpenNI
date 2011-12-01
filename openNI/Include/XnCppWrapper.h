@@ -93,7 +93,7 @@ namespace xn
 		{
 			return (xnVersionCompare(&m_version, &other.m_version) != 0);
 		}
-		bool operator<(const Version& other) const 
+		bool operator<(const Version& other) const
 		{
 			return (xnVersionCompare(&m_version, &other.m_version) < 0);
 		}
@@ -346,7 +346,7 @@ namespace xn
 		XnStatus AllocateData(XnUInt32 nXRes, XnUInt32 nYRes)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			XnUInt32 nSize = nXRes * nYRes * BytesPerPixel();
 			nRetVal = OutputMetaData::AllocateData(nSize);
 			XN_IS_STATUS_OK(nRetVal);
@@ -354,7 +354,7 @@ namespace xn
 			FullXRes() = XRes() = nXRes;
 			FullYRes() = YRes() = nYRes;
 			XOffset() = YOffset() = 0;
-			
+
 			return (XN_STATUS_OK);
 		}
 
@@ -440,7 +440,7 @@ namespace xn
 		_pixelType*& m_pData;													\
 		XnUInt32& m_nXRes;														\
 		XnUInt32& m_nYRes;														\
-	};																		
+	};
 
 	_XN_DECLARE_MAP_DATA_CLASS(DepthMap, XnDepthPixel);
 	_XN_DECLARE_MAP_DATA_CLASS(ImageMap, XnUInt8);
@@ -460,7 +460,7 @@ namespace xn
 		/**
 		 * Ctor.
 		 */
-		inline DepthMetaData() : 
+		inline DepthMetaData() :
 			MapMetaData(XN_PIXEL_FORMAT_GRAYSCALE_16_BIT, (const XnUInt8**)&m_depth.pData),
 			m_depthMap(const_cast<XnDepthPixel*&>(m_depth.pData), MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y),
 			m_writableDepthMap((XnDepthPixel*&)m_pAllocatedData, MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y)
@@ -528,10 +528,10 @@ namespace xn
 		/// Gets a light object wrapping the depth-map
 		inline const xn::DepthMap& DepthMap() const { return m_depthMap; }
 		/// Gets a light object wrapping the writable depth-map
-		inline xn::DepthMap& WritableDepthMap() 
-		{ 
+		inline xn::DepthMap& WritableDepthMap()
+		{
 			MakeDataWritable();
-			return m_writableDepthMap; 
+			return m_writableDepthMap;
 		}
 
 		/**
@@ -539,10 +539,10 @@ namespace xn
 		 *
 		 * @param	nIndex		[in]	The index of the pixel in the buffer.
 		 */
-		inline const XnDepthPixel& operator[](XnUInt32 nIndex) const 
-		{ 
+		inline const XnDepthPixel& operator[](XnUInt32 nIndex) const
+		{
 			XN_ASSERT(nIndex < (XRes()*YRes()));
-			return Data()[nIndex]; 
+			return Data()[nIndex];
 		}
 
 		/**
@@ -551,10 +551,10 @@ namespace xn
 		 * @param	x		[in]	X-coordinate of the pixel in the map
 		 * @param	y		[in]	Y-coordinate of the pixel in the map
 		 */
-		inline const XnDepthPixel& operator()(XnUInt32 x, XnUInt32 y) const 
+		inline const XnDepthPixel& operator()(XnUInt32 x, XnUInt32 y) const
 		{
 			XN_ASSERT(x < XRes() && y < YRes());
-			return Data()[y*XRes() + x]; 
+			return Data()[y*XRes() + x];
 		}
 
 		/// @copydoc xn::OutputMetaData::GetUnderlying
@@ -580,7 +580,7 @@ namespace xn
 	{
 	public:
 		/// Ctor
-		inline ImageMetaData() : 
+		inline ImageMetaData() :
 			MapMetaData(XN_PIXEL_FORMAT_RGB24, &m_image.pData),
 			m_imageMap(const_cast<XnUInt8*&>(m_image.pData), MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y),
 			m_writableImageMap((XnUInt8*&)m_pAllocatedData, MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y),
@@ -762,7 +762,7 @@ namespace xn
 	{
 	public:
 		/// Ctor
-		inline IRMetaData() : 
+		inline IRMetaData() :
 			MapMetaData(XN_PIXEL_FORMAT_GRAYSCALE_16_BIT, (const XnUInt8**)&m_ir.pData),
 			m_irMap(const_cast<XnIRPixel*&>(m_ir.pData), MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y),
 			m_writableIRMap((XnIRPixel*&)m_pAllocatedData, MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y)
@@ -891,7 +891,7 @@ namespace xn
 	{
 	public:
 		/// Ctor
-		inline SceneMetaData() : 
+		inline SceneMetaData() :
 			MapMetaData(XN_PIXEL_FORMAT_GRAYSCALE_16_BIT, (const XnUInt8**)&m_scene.pData),
 			m_labelMap(const_cast<XnLabel*&>(m_scene.pData), MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y),
 			m_writableLabelMap((XnLabel*&)m_pAllocatedData, MapMetaData::GetUnderlying()->Res.X, MapMetaData::GetUnderlying()->Res.Y)
@@ -1048,7 +1048,7 @@ namespace xn
 
 		/// TRUE if the object points to an actual node, FALSE otherwise.
 		inline XnBool IsValid() const { return (GetHandle() != NULL); }
-		
+
 		/** @copybrief xnGetNodeName()
 		 * For full details and usage, see @ref xnGetNodeName()
 		 */
@@ -1062,7 +1062,7 @@ namespace xn
 		/** @copybrief xnProductionNodeRelease
 		 * For full details and usage, see @ref xnProductionNodeRelease
 		 */
-		inline void Release() 
+		inline void Release()
 		{
 			NodeWrapper::SetHandle(NULL);
 		}
@@ -1071,8 +1071,8 @@ namespace xn
 		inline void XN_API_DEPRECATED("Please use Release() instead.") Unref() { Release(); }
 
 		/// Replaces the object being pointed.
-		inline void SetHandle(XnNodeHandle hNode) 
-		{ 
+		inline void SetHandle(XnNodeHandle hNode)
+		{
 			if (m_hNode == hNode)
 			{
 				// Optimization: do nothing
@@ -1102,7 +1102,7 @@ namespace xn
 				xnContextRelease(pContext);
 			}
 
-			m_hNode = hNode; 
+			m_hNode = hNode;
 		}
 
 		inline void TakeOwnership(XnNodeHandle hNode)
@@ -1220,7 +1220,7 @@ namespace xn
 		 * Gets the node instance represented by this info object.
 		 *
 		 * @param	node		[in]	A production node to be pointing to the node.
-		 * 
+		 *
 		 * @returns an error if this node info object does not point to an actual node.
 		 */
 		inline XnStatus GetInstance(ProductionNode& node) const;
@@ -1287,7 +1287,7 @@ namespace xn
 
 		/** @copybrief xnNodeQuerySetName()
 		 * For full details and usage, see @ref xnNodeQuerySetName()
-		 */		
+		 */
 		inline XnStatus SetName(const XnChar* strName)
 		{
 			return xnNodeQuerySetName(m_pQuery, strName);
@@ -1295,7 +1295,7 @@ namespace xn
 
 		/** @copybrief xnNodeQuerySetMinVersion
 		 * For full details and usage, see @ref xnNodeQuerySetMinVersion
-		 */		
+		 */
 		inline XnStatus SetMinVersion(const XnVersion& minVersion)
 		{
 			return xnNodeQuerySetMinVersion(m_pQuery, &minVersion);
@@ -1351,7 +1351,7 @@ namespace xn
 
 		/** @copybrief xnNodeQuerySetCreationInfo
 		 * For full details and usage, see @ref xnNodeQuerySetCreationInfo
-		 */		
+		 */
 		inline XnStatus SetCreationInfo(const XnChar* strCreationInfo)
 		{
 			return xnNodeQuerySetCreationInfo(m_pQuery, strCreationInfo);
@@ -1472,7 +1472,7 @@ namespace xn
 		/**
 		 * Creates a new @ref NodeInfoList object.
 		 */
-		inline NodeInfoList() 
+		inline NodeInfoList()
 		{
 			xnNodeInfoListAllocate(&m_pList);
 			m_bAllocated = TRUE;
@@ -1501,7 +1501,7 @@ namespace xn
 		 *
 		 * @param	pList		[in]	The list to wrap.
 		 */
-		inline void ReplaceUnderlyingObject(XnNodeInfoList* pList) 
+		inline void ReplaceUnderlyingObject(XnNodeInfoList* pList)
 		{
 			FreeImpl();
 			m_pList = pList;
@@ -2251,7 +2251,7 @@ namespace xn
 		{
 			return xnGetData(GetHandle());
 		}
-		
+
 		/** @copybrief xnGetDataSize
 		 * For full details and usage, see @ref xnGetDataSize
 		 */
@@ -2282,8 +2282,8 @@ namespace xn
 		 * by calling @ref IsCapabilitySupported().
 		 */
 		inline const MirrorCapability GetMirrorCap() const
-		{ 
-			return MirrorCapability(GetHandle()); 
+		{
+			return MirrorCapability(GetHandle());
 		}
 
 		/**
@@ -2292,8 +2292,8 @@ namespace xn
 		 * by calling @ref IsCapabilitySupported().
 		 */
 		inline MirrorCapability GetMirrorCap()
-		{ 
-			return MirrorCapability(GetHandle()); 
+		{
+			return MirrorCapability(GetHandle());
 		}
 
 		/**
@@ -2302,8 +2302,8 @@ namespace xn
 		 * by calling @ref IsCapabilitySupported().
 		 */
 		inline const AlternativeViewPointCapability GetAlternativeViewPointCap() const
-		{ 
-			return AlternativeViewPointCapability(GetHandle()); 
+		{
+			return AlternativeViewPointCapability(GetHandle());
 		}
 
 		/**
@@ -2312,8 +2312,8 @@ namespace xn
 		 * by calling @ref IsCapabilitySupported().
 		 */
 		inline AlternativeViewPointCapability GetAlternativeViewPointCap()
-		{ 
-			return AlternativeViewPointCapability(GetHandle()); 
+		{
+			return AlternativeViewPointCapability(GetHandle());
 		}
 
 		/**
@@ -2997,7 +2997,7 @@ namespace xn
 		/** @copybrief xnGetDepthMetaData
 		 * For full details and usage, see @ref xnGetDepthMetaData
 		 */
-		inline void GetMetaData(DepthMetaData& metaData) const 
+		inline void GetMetaData(DepthMetaData& metaData) const
 		{
 			xnGetDepthMetaData(GetHandle(), metaData.GetUnderlying());
 		}
@@ -3164,7 +3164,7 @@ namespace xn
 		/** @copybrief xnGetImageMetaData
 		 * For full details and usage, see @ref xnGetImageMetaData
 		 */
-		inline void GetMetaData(ImageMetaData& metaData) const 
+		inline void GetMetaData(ImageMetaData& metaData) const
 		{
 			xnGetImageMetaData(GetHandle(), metaData.GetUnderlying());
 		}
@@ -3201,7 +3201,7 @@ namespace xn
 			return xnGetGrayscale16ImageMap(GetHandle());
 		}
 
-		/** @copybrief xnGetImageMap() 
+		/** @copybrief xnGetImageMap()
 		 * For full details, see @ref xnGetImageMap().
 		 */
 		inline const XnUInt8* GetImageMap() const
@@ -3335,8 +3335,8 @@ namespace xn
 		/** @copybrief xnGetIRMetaData
 		 * For full details and usage, see @ref xnGetIRMetaData
 		 */
-		inline void GetMetaData(IRMetaData& metaData) const 
-		{ 
+		inline void GetMetaData(IRMetaData& metaData) const
+		{
 			xnGetIRMetaData(GetHandle(), metaData.GetUnderlying());
 		}
 
@@ -3422,7 +3422,7 @@ namespace xn
 		 *
 		 * @param	hNode		[in]	Node handle
 		 */
-		inline GestureGenerator(XnNodeHandle hNode = NULL) : Generator(hNode) {} 
+		inline GestureGenerator(XnNodeHandle hNode = NULL) : Generator(hNode) {}
 		inline GestureGenerator(const NodeWrapper& other) : Generator(other) {}
 
 		/** @copybrief xnCreateGestureGenerator
@@ -3504,7 +3504,7 @@ namespace xn
 
 		/**
 		 * Callback for the recognition of a gesture
-		 * 
+		 *
 		 * @param	generator		[in]	The node that raised the event.
 		 * @param	strGesture		[in]	The gesture that was recognized.
 		 * @param	pIDPosition		[in]	The position in which the gesture was identified.
@@ -3529,7 +3529,7 @@ namespace xn
 		XnStatus RegisterGestureCallbacks(GestureRecognized RecognizedCB, GestureProgress ProgressCB, void* pCookie, XnCallbackHandle& hCallback)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			GestureCookie* pGestureCookie;
 			XN_VALIDATE_ALLOC(pGestureCookie, GestureCookie);
 			pGestureCookie->recognizedHandler = RecognizedCB;
@@ -4073,7 +4073,7 @@ namespace xn
 		/** @copybrief xnIsJointActive
 		 * For full details and usage, see @ref xnIsJointActive
 		 */
-		XN_API_DEPRECATED("Use the version with one argument") 
+		XN_API_DEPRECATED("Use the version with one argument")
 		inline XnBool IsJointActive(XnSkeletonJoint eJoint, XnBool /*bState*/) const
 		{
 			return xnIsJointActive(GetHandle(), eJoint);
@@ -4273,7 +4273,7 @@ namespace xn
 
 		/**
 		 * Callback for indication that a specific user's skeleton is now starting the calibration process
-		 * 
+		 *
 		 * @param	skeleton	[in]	The node that raised the event.
 		 * @param	user		[in]	The id of the user that's being calibrated.
 		 * @param	pCookie		[in]	A user-provided cookie that was given when registering to this event.
@@ -4281,7 +4281,7 @@ namespace xn
 		typedef void (XN_CALLBACK_TYPE* CalibrationStart)(SkeletonCapability& skeleton, XnUserID user, void* pCookie);
 		/**
 		 * Callback for indication that a specific user's skeleton has now completed the calibration process
-		 * 
+		 *
 		 * @param	hNode		[in]	The node that raised the event.
 		 * @param	user		[in]	The id of the user for which calibration was attempted.
 		 * @param	bSuccess	[in]	An indication of whether or not the calibration attempt succeeded.
@@ -4366,7 +4366,7 @@ namespace xn
 
 		/**
 		 * Callback for indication that a specific user's skeleton is calibrating, and its current status
-		 * 
+		 *
 		 * @param	hNode				[in]	The node that raised the event.
 		 * @param	user				[in]	The id of the user for which calibration was attempted.
 		 * @param	calibrationError	[in]	the current status of the calibration
@@ -4410,7 +4410,7 @@ namespace xn
 
 		/**
 		 * Callback for indication that a specific user's skeleton has now completed the calibration process, with a status
-		 * 
+		 *
 		 * @param	hNode				[in]	The node that raised the event.
 		 * @param	user				[in]	The id of the user for which calibration was attempted.
 		 * @param	calibrationError	[in]	The status in which the calibration has ended.
@@ -4862,7 +4862,7 @@ namespace xn
 		{
 			return xnGetUserPixels(GetHandle(), user, smd.GetUnderlying());
 		}
-		
+
 		/** @copybrief xnRegisterUserCallbacks
 		 * For full details and usage, see @ref xnRegisterUserCallbacks
 		 */
@@ -5376,9 +5376,9 @@ namespace xn
 		};
 
 		/// Gets an iterator to the first item in the list.
-		inline Iterator Begin() const { return Iterator(xnEnumerationErrorsGetFirst(m_pErrors)); } 
+		inline Iterator Begin() const { return Iterator(xnEnumerationErrorsGetFirst(m_pErrors)); }
 		/// Gets an iterator representing the end of the list. This iterator does not point to an actual item.
-		inline Iterator End() const { return Iterator(NULL); } 
+		inline Iterator End() const { return Iterator(NULL); }
 
 		/** @copybrief xnEnumerationErrorsToString
 		 * For full details and usage, see @ref xnEnumerationErrorsToString
@@ -5445,8 +5445,8 @@ namespace xn
 		}
 
 		/// Dtor
-		~Context() 
-		{ 
+		~Context()
+		{
 			SetHandle(NULL);
 		}
 
@@ -5492,13 +5492,13 @@ namespace xn
 		inline XnStatus RunXmlScript(const XnChar* strScript, ScriptNode& scriptNode, EnumerationErrors* pErrors = NULL)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			XnNodeHandle hScriptNode;
 			nRetVal = xnContextRunXmlScriptEx(m_pContext, strScript, pErrors == NULL ? NULL : pErrors->GetUnderlying(), &hScriptNode);
 			XN_IS_STATUS_OK(nRetVal);
 
 			scriptNode.TakeOwnership(hScriptNode);
-			
+
 			return (XN_STATUS_OK);
 		}
 
@@ -5586,13 +5586,13 @@ namespace xn
 		inline XnStatus OpenFileRecording(const XnChar* strFileName, ProductionNode& playerNode)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			XnNodeHandle hPlayer;
 			nRetVal = xnContextOpenFileRecordingEx(m_pContext, strFileName, &hPlayer);
 			XN_IS_STATUS_OK(nRetVal);
 
 			playerNode.TakeOwnership(hPlayer);
-			
+
 			return (XN_STATUS_OK);
 		}
 
@@ -5602,13 +5602,13 @@ namespace xn
 		inline XnStatus CreateMockNode(XnProductionNodeType type, const XnChar* strName, ProductionNode& mockNode)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			XnNodeHandle hMockNode;
 			nRetVal = xnCreateMockNode(m_pContext, type, strName, &hMockNode);
 			XN_IS_STATUS_OK(nRetVal);
 
 			mockNode.TakeOwnership(hMockNode);
-			
+
 			return (XN_STATUS_OK);
 		}
 
@@ -5723,7 +5723,7 @@ namespace xn
 		XnStatus CreateAnyProductionTree(XnProductionNodeType type, Query* pQuery, ProductionNode& node, EnumerationErrors* pErrors = NULL)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			XnNodeQuery* pInternalQuery = (pQuery != NULL) ? pQuery->GetUnderlyingObject() : NULL;
 
 			XnNodeHandle hNode;
@@ -5953,7 +5953,7 @@ namespace xn
 			{
 				if (m_bUsingDeprecatedAPI && m_bAllocated)
 				{
-					// Backwards compatibility: call shutdown instead of release, to make old programs get the 
+					// Backwards compatibility: call shutdown instead of release, to make old programs get the
 					// exact same behavior they used to have.
 					xnForceShutdown(m_pContext);
 				}
@@ -6230,7 +6230,7 @@ namespace xn
 		TakeOwnership(hNode);
 		return (XN_STATUS_OK);
 	}
-	
+
 	inline XnStatus MockIRGenerator::Create(Context& context, const XnChar* strName /* = NULL */)
 	{
 		XnNodeHandle hNode;
@@ -6383,7 +6383,7 @@ namespace xn
 		static XnStatus RegisterToUnderlying(_XnRegisterStateChangeFuncPtr xnFunc, XnNodeHandle hNode, StateChangedHandler handler, void* pCookie, XnCallbackHandle& hCallback)
 		{
 			XnStatus nRetVal = XN_STATUS_OK;
-			
+
 			StateChangedCallbackTranslator* pTrans;
 			XN_VALIDATE_NEW(pTrans, StateChangedCallbackTranslator, handler, pCookie);
 
@@ -6395,7 +6395,7 @@ namespace xn
 			}
 
 			hCallback = pTrans;
-			
+
 			return (XN_STATUS_OK);
 		}
 
