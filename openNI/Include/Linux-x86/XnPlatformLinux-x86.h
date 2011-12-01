@@ -1,28 +1,24 @@
-/*****************************************************************************
-*                                                                            *
-*  OpenNI 1.0 Alpha                                                          *
-*  Copyright (C) 2010 PrimeSense Ltd.                                        *
-*                                                                            *
-*  This file is part of OpenNI.                                              *
-*                                                                            *
-*  OpenNI is free software: you can redistribute it and/or modify            *
-*  it under the terms of the GNU Lesser General Public License as published  *
-*  by the Free Software Foundation, either version 3 of the License, or      *
-*  (at your option) any later version.                                       *
-*                                                                            *
-*  OpenNI is distributed in the hope that it will be useful,                 *
-*  but WITHOUT ANY WARRANTY; without even the implied warranty of            *
-*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the              *
-*  GNU Lesser General Public License for more details.                       *
-*                                                                            *
-*  You should have received a copy of the GNU Lesser General Public License  *
-*  along with OpenNI. If not, see <http://www.gnu.org/licenses/>.            *
-*                                                                            *
-*****************************************************************************/
-
-
-
-
+/****************************************************************************
+*                                                                           *
+*  OpenNI 1.x Alpha                                                         *
+*  Copyright (C) 2011 PrimeSense Ltd.                                       *
+*                                                                           *
+*  This file is part of OpenNI.                                             *
+*                                                                           *
+*  OpenNI is free software: you can redistribute it and/or modify           *
+*  it under the terms of the GNU Lesser General Public License as published *
+*  by the Free Software Foundation, either version 3 of the License, or     *
+*  (at your option) any later version.                                      *
+*                                                                           *
+*  OpenNI is distributed in the hope that it will be useful,                *
+*  but WITHOUT ANY WARRANTY; without even the implied warranty of           *
+*  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the             *
+*  GNU Lesser General Public License for more details.                      *
+*                                                                           *
+*  You should have received a copy of the GNU Lesser General Public License *
+*  along with OpenNI. If not, see <http://www.gnu.org/licenses/>.           *
+*                                                                           *
+****************************************************************************/
 #ifndef _XN_PLATFORM_LINUX_X86_H_
 #define _XN_PLATFORM_LINUX_X86_H_
 
@@ -38,6 +34,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 
 //---------------------------------------------------------------------------
 // Platform Basic Definition
@@ -67,7 +64,7 @@ typedef	unsigned char		XnUChar;
 typedef	wchar_t				XnWChar;
 
 /** 8-bit signed integer. */ 
-typedef	char				XnInt8;
+typedef	signed char			XnInt8;
 /** 8-bit unsigned integer. */ 
 typedef	unsigned char		XnUInt8;
 
@@ -103,31 +100,31 @@ typedef void (*XnFarProc)(void *);
 typedef size_t				XnSizeT;
 
 /** Max unsigned 8-bit value */ 
-#define XN_MAX_UINT8 255
+#define XN_MAX_UINT8 UCHAR_MAX
 /** Max unsigned 16-bit value */ 
-#define XN_MAX_UINT16 65535
+#define XN_MAX_UINT16 USHRT_MAX
 /** Max unsigned 32-bit value */ 
-#define XN_MAX_UINT32 4294967295UL
+#define XN_MAX_UINT32 UINT_MAX
 /** Max unsigned 64-bit value */ 
-#define XN_MAX_UINT64 18446744073709551615ULL
+#define XN_MAX_UINT64 ULLONG_MAX
 
 /** Min signed 8-bit value */ 
-#define XN_MIN_INT8 -128
+#define XN_MIN_INT8 SCHAR_MIN
 /** Min signed 16-bit value */ 
-#define XN_MIN_INT16 -32768
+#define XN_MIN_INT16 SHRT_MIN
 /** Min signed 32-bit value */ 
-#define XN_MIN_INT32 -2147483648
+#define XN_MIN_INT32 INT_MIN
 /** Min signed 64-bit value */ 
-#define XN_MIN_INT64 -9223372036854775808LL
+#define XN_MIN_INT64 LLONG_MIN
 
 /** Max signed 8-bit value */ 
-#define XN_MAX_INT8 127
+#define XN_MAX_INT8 SCHAR_MAX
 /** Max signed 16-bit value */ 
-#define XN_MAX_INT16 32767
+#define XN_MAX_INT16 SHRT_MAX
 /** Max signed 32-bit value */ 
-#define XN_MAX_INT32 2147483647
+#define XN_MAX_INT32 INT_MAX
 /** Max signed 64-bit value */ 
-#define XN_MAX_INT64 9223372036854775807LL
+#define XN_MAX_INT64 LLONG_MAX
 
 //---------------------------------------------------------------------------
 // Memory
@@ -179,7 +176,7 @@ typedef size_t				XnSizeT;
 #define XN_API_IMPORT 
 
 /** Indicates a deprecated function */
-#define XN_API_DEPRECATED(msg) __attribute__((deprecated))
+#define XN_API_DEPRECATED(msg) __attribute__((warning("This function is deprecated: " msg)))
 
 /** Declares a global shared library export function. */ 
 #define XN_API_EXPORT_INIT()

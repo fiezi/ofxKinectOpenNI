@@ -10,8 +10,8 @@
 #define _XNV_NITE_VERSION_H_
 
 #define XNV_NITE_MAJOR_VERSION 1
-#define XNV_NITE_MINOR_VERSION 4
-#define XNV_NITE_MAINTENANCE_VERSION 1
+#define XNV_NITE_MINOR_VERSION 5
+#define XNV_NITE_MAINTENANCE_VERSION 0
 #define XNV_NITE_BUILD_VERSION 2
 
 /** Nite Framework version (in brief string format): "Major.Minor.Maintenance (Build)" */ 
