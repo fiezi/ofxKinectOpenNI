@@ -4,6 +4,7 @@
 
 #include "ofConstants.h"
 #include "ofTexture.h"
+#include "ofImage.h"
 #include "ofGraphics.h"
 #include "ofTypes.h"
 #include "ofxThread.h"
@@ -143,8 +144,8 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 
 		bool					bUseTexture;
 		bool                    bImage;
-		ofTexture				depthTex;			// the depth texture
-		ofTexture 				videoTex;				// the RGB texture
+		ofImage				    depthTex;			// the depth texture
+		ofImage 				videoTex;				// the RGB texture
 		bool 					bVerbose;
 		bool 					bGrabberInited;
 

@@ -154,7 +154,7 @@ ofxKinect::ofxKinect(){
 
 	bDepthNearValueWhite	= false;
 
-	bImage=false;
+	bImage=true;
 
 	ofxKinect::thisKinect = this;
 
@@ -258,18 +258,20 @@ unsigned char * ofxKinect::getCalibratedRGBPixels(){
 
 //------------------------------------
 ofTexture & ofxKinect::getTextureReference(){
-	if(!videoTex.bAllocated()){
-		ofLog(OF_LOG_WARNING, "ofxKinect: getTextureReference - texture is not allocated");
-	}
-	return videoTex;
+//	if(!videoTex.bAllocated()){
+//		ofLog(OF_LOG_WARNING, "ofxKinect: getTextureReference - texture is not allocated");
+//	}
+//	return videoTex;
 }
 
 //---------------------------------------------------------------------------
 ofTexture & ofxKinect::getDepthTextureReference(){
+/*
 	if(!depthTex.bAllocated()){
 		ofLog(OF_LOG_WARNING, "ofxKinect: getDepthTextureReference - texture is not allocated");
 	}
 	return depthTex;
+*/
 }
 
 //--------------------------------------------------------------------
@@ -437,8 +439,12 @@ void ofxKinect::update(){
 	}
 
 	if(bUseTexture){
-		depthTex.loadData(depthPixels, width, height, GL_LUMINANCE);
-		videoTex.loadData(videoPixelsBack, width, height, bInfrared?GL_LUMINANCE:GL_RGB);
+		//depthTex.loadData(depthPixels, width, height, GL_LUMINANCE);
+		depthTex.setFromPixels(depthPixels, width, height, OF_IMAGE_GRAYSCALE);
+
+		videoTex.setFromPixels(videoPixelsBack, width, height, OF_IMAGE_COLOR);
+
+
 		bUpdateTex = false;
 	}
 }
@@ -662,7 +668,7 @@ int ofxKinect::openKinect(){
         rc = kinectContext->FindExistingNode(XN_NODE_TYPE_IMAGE, image);
         CHECK_RC(rc, "Find image generator");
 
-
+        /*
         XnBool isSupported = depth.IsCapabilitySupported("AlternativeViewPoint");
         if(isSupported){
           XnStatus res = depth.GetAlternativeViewPointCap().SetViewPoint(image);
@@ -671,6 +677,7 @@ int ofxKinect::openKinect(){
           }
 
         }
+        */
         rc = xnFPSInit(&xnFPS, 30);
         CHECK_RC(rc, "FPS Init");
 
