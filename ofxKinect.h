@@ -7,8 +7,7 @@
 #include "ofImage.h"
 #include "ofGraphics.h"
 #include "ofTypes.h"
-#include "ofxThread.h"
-#include "ofxVectorMath.h"
+#include "ofMain.h"
 
 
     #define OPENNI
@@ -49,7 +48,7 @@ struct kinectUser{
 };
 
 
-class ofxKinect : public ofBaseVideo, protected ofxThread{
+class ofxKinect : public ofVideoGrabber, protected ofThread {
 
 	public :
 
@@ -80,7 +79,7 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		float getDistanceAt(const ofPoint & p);
 
 		/// calculates the coordinate in the world for the pixel (perspective calculation). Center  of image is (0.0)
-		ofxPoint3f getWorldCoordinateFor(int x, int y);
+		ofPoint getWorldCoordinateFor(int x, int y);
 
 		ofColor	getColorAt(int x, int y);
 		ofColor getColorAt(const ofPoint & p);
@@ -88,8 +87,8 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 		ofColor getCalibratedColorAt(int x, int y);
 		ofColor getCalibratedColorAt(const ofPoint & p);
 
-		ofxMatrix4x4 getRGBDepthMatrix();
-		void setRGBDepthMatrix(const ofxMatrix4x4 & matrix);
+		ofMatrix4x4 getRGBDepthMatrix();
+		void setRGBDepthMatrix(const ofMatrix4x4 & matrix);
 
 		float 			getHeight();
 		float 			getWidth();
@@ -197,7 +196,7 @@ class ofxKinect : public ofBaseVideo, protected ofxThread{
 
 		bool bDepthNearValueWhite;
 
-		ofxMatrix4x4		rgbDepthMatrix;
+		ofMatrix4x4		rgbDepthMatrix;
 
 		bool				bInfrared;
 		int					bytespp;

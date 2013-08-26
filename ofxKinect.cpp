@@ -239,7 +239,7 @@ float* ofxKinect::getDistancePixels() {
 
 //---------------------------------------------------------------------------
 unsigned char * ofxKinect::getCalibratedRGBPixels(){
-	ofxVec3f texcoord3d;
+	ofVec3f texcoord3d;
 	unsigned char * calibratedPixels = calibratedRGBPixels;
 	for ( int y = 0; y < height; y++) {
 		for ( int x = 0; x < width; x++) {
@@ -377,8 +377,8 @@ bool ofxKinect::init(bool infrared, bool setUseTexture){
 	memset(videoPixelsBack, 0, length*bytespp*sizeof(unsigned char));
 
 	if(bUseTexture){
-		depthTex.allocate(width, height, GL_LUMINANCE);
-		videoTex.allocate(width, height, infrared?GL_LUMINANCE:GL_RGB);
+		depthTex.allocate(width, height, OF_IMAGE_GRAYSCALE);
+		videoTex.allocate(width, height, infrared?OF_IMAGE_GRAYSCALE:OF_IMAGE_COLOR);
 	}
 
 	bGrabberInited = true;
@@ -461,14 +461,14 @@ float ofxKinect::getDistanceAt(const ofPoint & p) {
 }
 
 //------------------------------------
-ofxPoint3f ofxKinect::getWorldCoordinateFor(int x, int y) {
+ofPoint ofxKinect::getWorldCoordinateFor(int x, int y) {
 	//Based on http://graphics.stanford.edu/~mdfisher/Kinect.html
 	static const double fx_d = 1.0 / 5.9421434211923247e+02;
 	static const double fy_d = 1.0 / 5.9104053696870778e+02;
 	static const double cx_d = 3.3930780975300314e+02;
 	static const double cy_d = 2.4273913761751615e+02;
 
-	ofxVec3f result;
+	ofVec3f result;
 	const double depth = getDistanceAt(x,y)/100.0;
 	result.x = float((x - cx_d) * depth * fx_d);
 	result.y = float((y - cy_d) * depth * fy_d);
@@ -496,7 +496,7 @@ ofColor ofxKinect::getColorAt(const ofPoint & p) {
 
 //------------------------------------
 ofColor ofxKinect::getCalibratedColorAt(int x, int y){
-	ofxVec3f texcoord3d;
+	ofVec3f texcoord3d;
 	texcoord3d.set(x,y,0);
 	texcoord3d = rgbDepthMatrix * texcoord3d;
 	return getColorAt(ofClamp(texcoord3d.x,0,width),ofClamp(texcoord3d.y,0,height));
@@ -508,12 +508,12 @@ ofColor ofxKinect::getCalibratedColorAt(const ofPoint & p){
 }
 
 //------------------------------------
-ofxMatrix4x4 ofxKinect::getRGBDepthMatrix(){
+ofMatrix4x4 ofxKinect::getRGBDepthMatrix(){
 	return rgbDepthMatrix;
 }
 
 //------------------------------------
-void ofxKinect::setRGBDepthMatrix(const ofxMatrix4x4 & matrix){
+void ofxKinect::setRGBDepthMatrix(const ofMatrix4x4 & matrix){
 	rgbDepthMatrix=matrix;
 }
 
