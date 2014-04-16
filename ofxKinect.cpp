@@ -239,7 +239,7 @@ bool ofxKinect::init(bool infrared, bool setUseTexture){
     else if(bUser)
         xml_path="data/Sample-User.xml";
     else
-        xml_path="data/Sample-User.xml";
+        xml_path="data/Samples-Depth.xml";
 
     numDevicesFound=0;
 	bytespp = infrared?1:3;
@@ -325,6 +325,7 @@ void ofxKinect::update(){
                     else
                         sensors[s].depthPixels[i]=dPixel;
             }
+
 
             memcpy(sensors[s].videoPixels, sensors[s].videoPixelsBack, n * bytespp);
 
@@ -467,10 +468,10 @@ void ofxKinect::threadedFunction(){
 
 
                 //unsigned short maxValue=2048;
-                thisKinect->sensors[0].bNeedsUpdate = true;
+                thisKinect->sensors[s].bNeedsUpdate = true;
 
                 unlock();
-                //ofSleepMillis(10);
+                ofSleepMillis(10);
             }
 		}
 	}
@@ -489,7 +490,7 @@ int ofxKinect::openKinect(){
 
     rc = XN_STATUS_OK;
 
-        rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
+    rc = kinectContext->InitFromXmlFile(xml_path.c_str(), &errors);
 
 
     NodeInfoList devicesList;
@@ -519,9 +520,6 @@ int ofxKinect::openKinect(){
        // Copy the device name
        xnOSMemCopy(sensors[i].name,deviceInfo.GetInstanceName(),
                    xnOSStrLen(deviceInfo.GetInstanceName()));
-       // Now create a depth generator over this device
-       rc = kinectContext->CreateAnyProductionTree(XN_NODE_TYPE_DEPTH, &query, sensors[i].depth);
-       CHECK_RC(rc, "Create Depth");
 
         if (bImage){
                // now create a image generator over this device
@@ -534,8 +532,9 @@ int ofxKinect::openKinect(){
             rc = kinectContext->StartGeneratingAll();
             CHECK_RC(rc, "StartGenerating");
 
-        }
-        if (bUser){
+            sensors[i].image.GetMetaData(sensors[i].imageMD);
+
+        }else if (bUser){
             rc = kinectContext->FindExistingNode(XN_NODE_TYPE_USER, sensors[i].userGenerator);
             CHECK_RC(rc, "Find user generator");
 
@@ -569,14 +568,25 @@ int ofxKinect::openKinect(){
             rc = sensors[i].userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(PoseDetected, this, hPoseCBs);
             CHECK_RC(rc, "Register to pose detected");
 
+        }else{
+
+            cout << "********************************************************************************" << endl;
+
+            // Now create a depth generator over this device
+            rc = kinectContext->CreateAnyProductionTree(XN_NODE_TYPE_DEPTH, &query, sensors[i].depth);
+            CHECK_RC(rc, "Create Depth");
+
+            rc = xnFPSInit(&xnFPS, 25);
+            CHECK_RC(rc, "FPS Init");
+
+            rc = kinectContext->StartGeneratingAll();
+            CHECK_RC(rc, "StartGenerating");
+
+            sensors[i].depth.GetMetaData(sensors[i].depthMD);
         }
 
 
-        sensors[i].depth.GetMetaData(sensors[i].depthMD);
 
-        if (bImage){
-            sensors[i].image.GetMetaData(sensors[i].imageMD);
-        }
    }
 }
 
