@@ -42,11 +42,47 @@
     using namespace xn;
 
 
+#define MAX_NUM_DEVICES 3
+
 struct kinectUser{
     int userID;
     bool bCalibrated;
 };
 
+
+struct DepthRgbSensors{
+        char name[80];
+
+        bool bNeedsUpdate;
+		bool bUpdateTex;
+
+
+        ProductionNode device;
+        DepthGenerator depth;
+        ImageGenerator image;
+
+        vector<kinectUser*> users;
+        UserGenerator userGenerator;
+
+        ImageMetaData imageMD;
+        DepthMetaData depthMD;
+        SceneMetaData sceneMD;
+
+        //image data
+
+		unsigned short *	depthPixelsBack;	// depth back
+		unsigned char *		videoPixelsBack;		// rgb back
+
+		ofImage				    depthTex;			// the depth texture
+		ofImage 				videoTex;				// the RGB texture
+		unsigned char *			depthPixels;
+		unsigned char *			videoPixels;
+		unsigned char *			calibratedRGBPixels;
+
+		unsigned short *		depthPixelsRaw;
+		float * 				distancePixels;
+
+};
 
 class ofxKinect : public ofVideoGrabber, protected ofThread {
 
@@ -54,9 +90,6 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
 
 		ofxKinect();
 		virtual ~ofxKinect();
-
-		/// are the current frames new?
-		bool isFrameNew();
 
 		/// open the connection and start grabbing images
 		bool open();
@@ -67,49 +100,32 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
 		/// initialize resources, must be called before open()
 		bool init(bool infrared=false, bool bTexture=true);
 
-		bool setCameraTiltAngle(float angleInDegrees);
-
 		/// updates the pixel buffers and textures - make sure to call this to update to the latetst incoming frames
 		void update();
 
 		/// clear resources
 		void clear();
 
-		float getDistanceAt(int x, int y);
-		float getDistanceAt(const ofPoint & p);
+		float getDistanceAt(int x, int y, int deviceID=0);
+		float getDistanceAt(const ofPoint & p, int deviceID=0);
 
 		/// calculates the coordinate in the world for the pixel (perspective calculation). Center  of image is (0.0)
-		ofPoint getWorldCoordinateFor(int x, int y);
-
-		ofColor	getColorAt(int x, int y);
-		ofColor getColorAt(const ofPoint & p);
-
-		ofColor getCalibratedColorAt(int x, int y);
-		ofColor getCalibratedColorAt(const ofPoint & p);
-
-		ofMatrix4x4 getRGBDepthMatrix();
-		void setRGBDepthMatrix(const ofMatrix4x4 & matrix);
+		ofPoint getWorldCoordinateFor(int x, int y, int deviceID=0);
 
 		float 			getHeight();
 		float 			getWidth();
 
 		float           cutOffFar;
 
-		ofPoint			getRawAccel();
-		ofPoint			getMksAccel();
-
 		/// get the pixels of the most recent rgb frame
-		unsigned char	* getPixels();
+		unsigned char	* getPixels(int deviceID=0);
 
 		/// get the pixels of the most recent depth frame
-		unsigned char 	* getDepthPixels();		// grey scale values
-		unsigned short	* getRawDepthPixels();	// raw 11 bit values
-
-		// get the rgb pixels corrected to match the depth frame
-		unsigned char * getCalibratedRGBPixels();
+		unsigned char 	* getDepthPixels(int deviceID=0);		// grey scale values
+		unsigned short	* getRawDepthPixels(int deviceID=0);	// raw 11 bit values
 
 		/// get the distance in centimeters to a given point
-		float* getDistancePixels();
+		float* getDistancePixels(int deviceID=0);
 
 		/// get the rgb texture
 		ofTexture &		getTextureReference();
@@ -117,23 +133,13 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
 		/// get the greyscale depth texture
 		ofTexture &		getDepthTextureReference();
 
-		/**
-			set the near value of the pixels in the greyscale depth image to white?
-
-			bEnabled = true : pixels close to the camera are brighter
-			bEnabled = false: pixels closer to the camera are darker (default)
-		**/
-		void enableDepthNearValueWhite(bool bEnabled=true);
-		bool isDepthNearValueWhite();
-
 		void 			setVerbose(bool bTalkToMe);
-
 		void 			setUseTexture(bool bUse);
-		void 			draw(float x, float y, float w, float h);
-		void 			draw(float x, float y);
+		void 			draw(float x, float y, float w, float h,int deviceID=0);
+		void 			draw(float x, float y,int deviceID=0);
 
-		void 			drawDepth(float x, float y, float w, float h);
-		void 			drawDepth(float x, float y);
+		void 			drawDepth(float x, float y, float w, float h,int deviceID=0);
+		void 			drawDepth(float x, float y,int deviceID=0);
 
 
 		const static int	width = 640;
@@ -143,31 +149,11 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
 
 		bool					bUseTexture;
 		bool                    bImage;
-		ofImage				    depthTex;			// the depth texture
-		ofImage 				videoTex;				// the RGB texture
+		bool                    bUser;
 		bool 					bVerbose;
 		bool 					bGrabberInited;
 
-		unsigned char *			depthPixels;
-		unsigned char *			videoPixels;
-		unsigned char *			calibratedRGBPixels;
-
-		unsigned short *		depthPixelsRaw;
-		float * 				distancePixels;
-
-		ofPoint rawAccel;
-		ofPoint mksAccel;
-
-		float targetTiltAngleDeg;
-		bool bTiltNeedsApplying;
-
-		static void calculateLookups();
-		static bool lookupsCalculated;
-		static float distancePixelsLookup[2048];
-		static unsigned char depthPixelsLookupNearWhite[2048];
-		static unsigned char depthPixelsLookupFarWhite[2048];
-
-        static ofxKinect*   thisKinect;
+        static ofxKinect*       thisKinect;
 
 
         Context * kinectContext;
@@ -176,31 +162,15 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
         XnStatus rc;
         XnFPSData xnFPS;
 
+
+        DepthRgbSensors sensors[MAX_NUM_DEVICES];
         DepthGenerator depth;
         ImageGenerator image;
 
-        vector<kinectUser*> users;
-        UserGenerator userGenerator;
-
         string xml_path;
 
-        ImageMetaData imageMD;
-        DepthMetaData depthMD;
-        SceneMetaData sceneMD;
-
-		unsigned short *	depthPixelsBack;	// depth back
-		unsigned char *		videoPixelsBack;		// rgb back
-
-		bool bNeedsUpdate;
-		bool bUpdateTex;
-
-		bool bDepthNearValueWhite;
-
-		ofMatrix4x4		rgbDepthMatrix;
-
-		bool				bInfrared;
 		int					bytespp;
-
+        int                 numDevicesFound;
 		// thread function
 		void threadedFunction();
 
@@ -210,7 +180,6 @@ class ofxKinect : public ofVideoGrabber, protected ofThread {
         void findPlayer();
         void lostPlayer();
 
-		void readDepthAtPoint();
 };
 
 #endif
