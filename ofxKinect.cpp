@@ -568,7 +568,10 @@ int ofxKinect::openKinect(){
             rc = sensors[i].userGenerator.GetPoseDetectionCap().RegisterToPoseDetected(PoseDetected, this, hPoseCBs);
             CHECK_RC(rc, "Register to pose detected");
 
-        }else{
+        }
+
+
+            //ALWAYS CREATE DEPTH!!!
 
             cout << "********************************************************************************" << endl;
 
@@ -583,7 +586,6 @@ int ofxKinect::openKinect(){
             CHECK_RC(rc, "StartGenerating");
 
             sensors[i].depth.GetMetaData(sensors[i].depthMD);
-        }
 
 
 
