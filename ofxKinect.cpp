@@ -279,9 +279,8 @@ bool ofxKinect::init(bool infrared, bool setUseTexture){
 //---------------------------------------------------------------------------
 void ofxKinect::clear(){
 
-    for (int i=0;i<MAX_NUM_DEVICES;i++){
+    for (int i=0;i<numDevicesFound;i++){
 
-        if(sensors[i].depthPixels != NULL){
             delete[] sensors[i].depthPixels; sensors[i].depthPixels = NULL;
             delete[] sensors[i].depthPixelsRaw; sensors[i].depthPixelsRaw = NULL;
             delete[] sensors[i].depthPixelsBack; sensors[i].depthPixelsBack = NULL;
@@ -289,11 +288,8 @@ void ofxKinect::clear(){
 
             delete[] sensors[i].videoPixels; sensors[i].videoPixels = NULL;
             delete[] sensors[i].videoPixelsBack; sensors[i].videoPixelsBack = NULL;
-        }
-    /*
-        depthTex.clear();
-        videoTex.clear();
-    */
+            sensors[i].depthTex.clear();
+            sensors[i].videoTex.clear();
     }
 
     bGrabberInited = false;
