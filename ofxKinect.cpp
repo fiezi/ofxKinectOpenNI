@@ -197,20 +197,20 @@ float* ofxKinect::getDistancePixels(int deviceID) {
 
 //------------------------------------
 ofTexture & ofxKinect::getTextureReference(){
-//	if(!videoTex.bAllocated()){
-//		ofLog(OF_LOG_WARNING, "ofxKinect: getTextureReference - texture is not allocated");
-//	}
-//	return videoTex;
+	if(!sensors[0].videoTex.bAllocated()){
+		ofLog(OF_LOG_WARNING, "ofxKinect: getTextureReference - texture is not allocated");
+	}
+	return sensors[0].videoTex.getTextureReference();
 }
 
 //---------------------------------------------------------------------------
 ofTexture & ofxKinect::getDepthTextureReference(){
-/*
-	if(!depthTex.bAllocated()){
+
+	if(!sensors[0].depthTex.bAllocated()){
 		ofLog(OF_LOG_WARNING, "ofxKinect: getDepthTextureReference - texture is not allocated");
 	}
-	return depthTex;
-*/
+	return sensors[0].depthTex.getTextureReference();
+
 }
 
 
@@ -335,9 +335,9 @@ void ofxKinect::update(){
             if(bUseTexture){
                 //depthTex.loadData(depthPixels, width, height, GL_LUMINANCE);
                 sensors[s].depthTex.setFromPixels(sensors[s].depthPixels, width, height, OF_IMAGE_GRAYSCALE);
-
+                sensors[s].depthTex.update();
                 sensors[s].videoTex.setFromPixels(sensors[s].videoPixelsBack, width, height, OF_IMAGE_COLOR);
-
+                sensors[s].videoTex.update();
 
                 sensors[s].bUpdateTex = false;
             }
